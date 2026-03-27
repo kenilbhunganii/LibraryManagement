@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Books{% endblock %}
+{% block topbar_title %}Book Catalog{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">Catalog</p>
+    <h1 class="page-title">Books</h1>
+  </div>
+  <a href="{{ url_for('add_book') }}" class="btn btn-primary">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add Book
+  </a>
+</div>
+
+<!-- FILTER ROW -->
+<div class="filter-row fade-up fade-up-1" style="margin-bottom: 20px;">
+  <button class="filter-chip active" data-filter="all">All</button>
+  <button class="filter-chip" data-filter="available">Available</button>
+  <button class="filter-chip" data-filter="borrowed">Borrowed</button>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrapper fade-up fade-up-2">
+  <div class="table-toolbar">
+    <span class="table-toolbar-title">
+      {{ books|length }} book{% if books|length != 1 %}s{% endif %}
+    </span>
+    <div class="search-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" class="search-input" id="bookSearch" placeholder="Search books…">
+    </div>
+  </div>
+
+  {% if books %}
+  <table id="bookTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Year</th>
+        <th>ISBN</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in books %}
+      <tr data-status="{% if book.available %}available{% else %}borrowed{% endif %}">
+        <td class="mono">{{ loop.index }}</td>
+        <td><strong>{{ book.title }}</strong></td>
+        <td>{{ book.author }}</td>
+        <td class="mono">{{ book.year }}</td>
+        <td class="mono">{{ book.isbn }}</td>
+        <td>
+          {% if book.available %}
+            <span class="badge badge-available">Available</span>
+          {% else %}
+            <span class="badge badge-borrowed">Borrowed</span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="display: flex; gap: 6px;">
+            <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View</a>
+            <form method="POST" action="{{ url_for('delete_book_route', isbn=book.isbn) }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-danger"
+                onclick="return confirm('Delete this book?')">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">📖</span>
+    <p class="empty-title">No books in the catalog</p>
+    <p class="empty-desc">Add your first book to get started</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Search filter
+document.getElementById('bookSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#bookTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+// Status filter chips
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    const f = this.dataset.filter;
+    document.querySelectorAll('#bookTable tbody tr').forEach(row => {
+      if (f === 'all') row.style.display = '';
+      else row.style.display = row.dataset.status === f ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

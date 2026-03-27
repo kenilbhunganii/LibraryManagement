@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">Overview</p>
+    <h1 class="page-title">Dashboard</h1>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid fade-up fade-up-1">
+  <div class="stat-card">
+    <span class="stat-tag">Total</span>
+    <p class="stat-label">Books</p>
+    <p class="stat-value">{{ total_books }}</p>
+    <p class="stat-desc">in collection</p>
+  </div>
+  <div class="stat-card">
+    <span class="stat-tag">Live</span>
+    <p class="stat-label">Available</p>
+    <p class="stat-value">{{ available_books }}</p>
+    <p class="stat-desc">ready to borrow</p>
+  </div>
+  <div class="stat-card">
+    <span class="stat-tag">Out</span>
+    <p class="stat-label">Borrowed</p>
+    <p class="stat-value">{{ borrowed_books }}</p>
+    <p class="stat-desc">currently out</p>
+  </div>
+  <div class="stat-card">
+    <span class="stat-tag">People</span>
+    <p class="stat-label">Members</p>
+    <p class="stat-value">{{ total_users }}</p>
+    <p class="stat-desc">registered</p>
+  </div>
+</div>
+
+<!-- RECENT BOOKS TABLE -->
+<div class="table-wrapper fade-up fade-up-2" style="margin-bottom: 32px;">
+  <div class="table-toolbar">
+    <span class="table-toolbar-title">Recent Additions</span>
+    <a href="{{ url_for('books') }}" class="btn btn-ghost btn-sm">View All →</a>
+  </div>
+
+  {% if recent_books %}
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Year</th>
+        <th>ISBN</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in recent_books %}
+      <tr>
+        <td><strong>{{ book.title }}</strong></td>
+        <td>{{ book.author }}</td>
+        <td class="mono">{{ book.year }}</td>
+        <td class="mono">{{ book.isbn }}</td>
+        <td>
+          {% if book.available %}
+            <span class="badge badge-available">Available</span>
+          {% else %}
+            <span class="badge badge-borrowed">Borrowed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">📚</span>
+    <p class="empty-title">No books yet</p>
+    <p class="empty-desc">Add your first book to get started</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- RECENT ACTIVITY + QUICK ACTIONS -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="fade-up fade-up-3">
+  <div>
+    <p class="section-label">Recent Activity</p>
+    <div class="activity-list">
+      {% if recent_activity %}
+        {% for entry in recent_activity %}
+        <div class="activity-item">
+          <div class="act-dot {% if entry.type == 'borrow' %}act-dot-out{% else %}act-dot-in{% endif %}"></div>
+          <div class="act-text">
+            <strong>{{ entry.user }}</strong>
+            {% if entry.type == 'borrow' %}borrowed{% else %}returned{% endif %}
+            <em>{{ entry.book }}</em>
+          </div>
+          <span class="act-time">{{ entry.date }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="activity-item">
+        <div class="act-dot act-dot-in"></div>
+        <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;">
+          No activity yet
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    <p class="section-label">Quick Actions</p>
+    <div style="display: flex; flex-direction: column; gap: 1px; background: var(--black); border: var(--border);">
+      <a href="{{ url_for('add_book') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+        <span>Add New Book</span>
+        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+      </a>
+      <a href="{{ url_for('add_user') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+        <span>Register Member</span>
+        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+      </a>
+      <a href="{{ url_for('borrow') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+        <span>Issue a Book</span>
+        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+      </a>
+      <a href="{{ url_for('search') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+        <span>Search Catalog</span>
+        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

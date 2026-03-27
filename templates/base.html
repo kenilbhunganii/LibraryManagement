@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Library{% endblock %} — Libris</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-mark">Libris</span>
+    <span class="logo-sub">Management System</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+
+    <a href="{{ url_for('home') }}"
+       class="nav-item {% if request.endpoint == 'home' %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="{{ url_for('books') }}"
+       class="nav-item {% if request.endpoint in ['books','add_book','book_detail'] %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+      </svg>
+      <span>Books</span>
+    </a>
+
+    <a href="{{ url_for('users') }}"
+       class="nav-item {% if request.endpoint in ['users','add_user'] %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      <span>Members</span>
+    </a>
+
+    <a href="{{ url_for('borrow') }}"
+       class="nav-item {% if request.endpoint == 'borrow' %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="17 1 21 5 17 9"/>
+        <path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/>
+        <path d="M21 13v2a4 4 0 01-4 4H3"/>
+      </svg>
+      <span>Borrow / Return</span>
+    </a>
+
+    <div class="nav-section-label">Library</div>
+
+    <a href="{{ url_for('search') }}"
+       class="nav-item {% if request.endpoint == 'search' %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>Search</span>
+    </a>
+
+    <a href="{{ url_for('activity') }}"
+       class="nav-item {% if request.endpoint == 'activity' %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <span>Activity Log</span>
+    </a>
+
+    <a href="{{ url_for('stats') }}"
+       class="nav-item {% if request.endpoint == 'stats' %}active{% endif %}">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span>Statistics</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="version">v1.0.0</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <span class="topbar-title">{% block topbar_title %}Libris{% endblock %}</span>
+    <div class="topbar-actions">
+      {% block topbar_actions %}{% endblock %}
+      <a href="{{ url_for('add_book') }}" class="btn btn-primary btn-sm">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="13" height="13">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Book
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="page-content">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash flash-{{ category }}">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14">
+              {% if category == 'success' %}
+              <polyline points="20 6 9 17 4 12"/>
+              {% else %}
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              {% endif %}
+            </svg>
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

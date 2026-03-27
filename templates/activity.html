@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Log{% endblock %}
+{% block topbar_title %}Activity Log{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">History</p>
+    <h1 class="page-title">Activity Log</h1>
+  </div>
+</div>
+
+<div class="activity-list fade-up fade-up-1">
+  {% if activity %}
+    {% for entry in activity %}
+    <div class="activity-item">
+      <div class="act-dot {% if entry.type == 'borrow' %}act-dot-out{% else %}act-dot-in{% endif %}"></div>
+      <div class="act-text">
+        <strong>{{ entry.user }}</strong>
+        {% if entry.type == 'borrow' %}borrowed{% elif entry.type == 'return' %}returned{% else %}{{ entry.type }}{% endif %}
+        <em>{{ entry.book }}</em>
+        {% if entry.type == 'add' %} to the catalog{% endif %}
+      </div>
+      <span class="act-time">{{ entry.date }}</span>
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="activity-item">
+    <div class="act-dot act-dot-in"></div>
+    <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px;">
+      No activity recorded yet. Start borrowing or returning books.
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

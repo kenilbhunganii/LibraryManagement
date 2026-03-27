@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow / Return{% endblock %}
+{% block topbar_title %}Borrow & Return{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">Circulation</p>
+    <h1 class="page-title">Borrow & Return</h1>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+  <!-- BORROW FORM -->
+  <div class="form-card fade-up fade-up-1">
+    <div class="form-card-header">
+      <p class="form-card-title">Issue a Book</p>
+      <p class="form-card-sub">Assign a book to a member</p>
+    </div>
+    <div class="form-body">
+      <form method="POST" action="{{ url_for('borrow') }}">
+        <input type="hidden" name="action" value="borrow">
+
+        <div class="form-group">
+          <label class="form-label" for="borrow_isbn">Book (ISBN)</label>
+          <div class="form-select-wrap">
+            <select id="borrow_isbn" name="isbn" class="form-select" required>
+              <option value="">— Select book —</option>
+              {% for book in available_books %}
+              <option value="{{ book.isbn }}">{{ book.title }} — {{ book.author }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="borrow_user">Member</label>
+          <div class="form-select-wrap">
+            <select id="borrow_user" name="user_id" class="form-select" required>
+              <option value="">— Select member —</option>
+              {% for user in users %}
+              <option value="{{ user.user_id }}">{{ user.name }} ({{ user.user_id }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">
+            {{ available_books|length }} available
+          </span>
+          <button type="submit" class="btn btn-primary">Issue Book →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RETURN FORM -->
+  <div class="form-card fade-up fade-up-2">
+    <div class="form-card-header" style="background: var(--white); color: var(--black); border-bottom: var(--border);">
+      <p class="form-card-title">Return a Book</p>
+      <p class="form-card-sub" style="color: var(--gray-400);">Mark a book as returned</p>
+    </div>
+    <div class="form-body">
+      <form method="POST" action="{{ url_for('borrow') }}">
+        <input type="hidden" name="action" value="return">
+
+        <div class="form-group">
+          <label class="form-label" for="return_isbn">Book (ISBN)</label>
+          <div class="form-select-wrap">
+            <select id="return_isbn" name="isbn" class="form-select" required>
+              <option value="">— Select book —</option>
+              {% for book in borrowed_books %}
+              <option value="{{ book.isbn }}">{{ book.title }} — {{ book.author }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="return_user">Member</label>
+          <div class="form-select-wrap">
+            <select id="return_user" name="user_id" class="form-select" required>
+              <option value="">— Select member —</option>
+              {% for user in users %}
+              <option value="{{ user.user_id }}">{{ user.name }} ({{ user.user_id }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">
+            {{ borrowed_books|length }} out
+          </span>
+          <button type="submit" class="btn btn-outline">Return Book ↩</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- CURRENTLY BORROWED TABLE -->
+<div style="margin-top: 36px;" class="fade-up fade-up-3">
+  <p class="section-label">Currently Borrowed</p>
+  <div class="table-wrapper">
+    {% if borrowed_books %}
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>ISBN</th>
+          <th>Borrowed By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in borrowed_books %}
+        <tr>
+          <td><strong>{{ book.title }}</strong></td>
+          <td>{{ book.author }}</td>
+          <td class="mono">{{ book.isbn }}</td>
+          <td>{{ book.borrowed_by or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-icon">✓</span>
+      <p class="empty-title">All books are in</p>
+      <p class="empty-desc">No books currently borrowed</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

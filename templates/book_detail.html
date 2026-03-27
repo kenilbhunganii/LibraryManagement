@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }}{% endblock %}
+{% block topbar_title %}Book Detail{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">
+      <a href="{{ url_for('books') }}" style="color: var(--gray-400); text-decoration: none;">Catalog</a>
+      → {{ book.title }}
+    </p>
+    <h1 class="page-title" style="font-size: 32px;">{{ book.title }}</h1>
+  </div>
+  <div style="display:flex; gap:10px;">
+    {% if book.available %}
+      <a href="{{ url_for('borrow') }}" class="btn btn-primary">Issue Book →</a>
+    {% else %}
+      <span class="badge badge-borrowed" style="padding: 10px 18px; font-size: 10px;">Currently Out</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- INFO GRID -->
+<div class="info-grid fade-up fade-up-1" style="margin-bottom: 32px;">
+  <div class="info-cell">
+    <p class="info-label">Author</p>
+    <p class="info-value">{{ book.author }}</p>
+  </div>
+  <div class="info-cell">
+    <p class="info-label">Year</p>
+    <p class="info-value" style="font-family: var(--font-mono);">{{ book.year }}</p>
+  </div>
+  <div class="info-cell">
+    <p class="info-label">ISBN</p>
+    <p class="info-value" style="font-family: var(--font-mono);">{{ book.isbn }}</p>
+  </div>
+  <div class="info-cell">
+    <p class="info-label">Status</p>
+    <p class="info-value">
+      {% if book.available %}
+        <span class="badge badge-available">Available</span>
+      {% else %}
+        <span class="badge badge-borrowed">Borrowed</span>
+      {% endif %}
+    </p>
+  </div>
+  {% if book.genre %}
+  <div class="info-cell">
+    <p class="info-label">Genre</p>
+    <p class="info-value">{{ book.genre }}</p>
+  </div>
+  {% endif %}
+</div>
+
+{% if book.description %}
+<div class="fade-up fade-up-2" style="margin-bottom: 32px;">
+  <p class="section-label">Description</p>
+  <p style="font-size: 14px; line-height: 1.7; max-width: 640px; color: var(--gray-600);">{{ book.description }}</p>
+</div>
+{% endif %}
+
+<!-- BORROW HISTORY -->
+<div class="fade-up fade-up-3">
+  <p class="section-label">Borrow History</p>
+  <div class="activity-list">
+    {% if book_history %}
+      {% for entry in book_history %}
+      <div class="activity-item">
+        <div class="act-dot {% if entry.type == 'borrow' %}act-dot-out{% else %}act-dot-in{% endif %}"></div>
+        <div class="act-text">
+          <strong>{{ entry.user }}</strong>
+          {% if entry.type == 'borrow' %}borrowed{% else %}returned{% endif %} this book
+        </div>
+        <span class="act-time">{{ entry.date }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+    <div class="activity-item">
+      <div class="act-dot act-dot-in"></div>
+      <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 11px;">
+        No borrow history yet
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="margin-top: 32px;" class="fade-up fade-up-4">
+  <form method="POST" action="{{ url_for('delete_book_route', isbn=book.isbn) }}" style="display:inline;">
+    <button type="submit" class="btn btn-sm btn-danger"
+      onclick="return confirm('Permanently delete this book?')">Delete Book</button>
+  </form>
+</div>
+{% endblock %}

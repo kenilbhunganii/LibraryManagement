@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Members{% endblock %}
+{% block topbar_title %}Members{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">People</p>
+    <h1 class="page-title">Members</h1>
+  </div>
+  <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add Member
+  </a>
+</div>
+
+<!-- SEARCH -->
+<div style="margin-bottom: 20px;" class="fade-up fade-up-1">
+  <div class="search-wrap">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" class="search-input" id="userSearch"
+      placeholder="Search members…" style="width: 280px;">
+  </div>
+</div>
+
+{% if users %}
+<div class="user-grid fade-up fade-up-2" id="userGrid">
+  {% for user in users %}
+  <div class="user-card" data-name="{{ user.name|lower }}">
+    <div class="user-avatar">{{ user.name[0] | upper }}</div>
+    <p class="user-name">{{ user.name }}</p>
+    <p class="user-id">ID — {{ user.user_id }}</p>
+    <p class="user-meta">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="12" height="12">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+      </svg>
+      {{ user.borrowed_books|length }} book{% if user.borrowed_books|length != 1 %}s{% endif %} borrowed
+    </p>
+    <div class="user-actions">
+      <form method="POST" action="{{ url_for('delete_user_route', user_id=user.user_id) }}">
+        <button type="submit" class="btn btn-sm btn-danger"
+          onclick="return confirm('Remove member?')">Remove</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state fade-up fade-up-2">
+  <span class="empty-icon">👤</span>
+  <p class="empty-title">No members registered</p>
+  <p class="empty-desc">Register your first member to start issuing books</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('userSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.user-card').forEach(card => {
+    card.style.display = card.dataset.name.includes(q) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

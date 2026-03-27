@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Add Member{% endblock %}
+{% block topbar_title %}Register Member{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">Members → New</p>
+    <h1 class="page-title">Add Member</h1>
+  </div>
+</div>
+
+<div class="form-card fade-up fade-up-1">
+  <div class="form-card-header">
+    <p class="form-card-title">Member Details</p>
+    <p class="form-card-sub">Register a new library member</p>
+  </div>
+
+  <div class="form-body">
+    <form method="POST" action="{{ url_for('add_user') }}">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" id="name" name="name" class="form-input"
+            placeholder="Jane Doe" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="user_id">Member ID</label>
+          <input type="text" id="user_id" name="user_id" class="form-input"
+            placeholder="MEM-001" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email <span style="color:var(--gray-400)">(optional)</span></label>
+        <input type="email" id="email" name="email" class="form-input"
+          placeholder="jane@example.com">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" for="phone">Phone <span style="color:var(--gray-400)">(optional)</span></label>
+        <input type="text" id="phone" name="phone" class="form-input"
+          placeholder="+1 234 567 8900">
+      </div>
+
+      <div class="form-footer">
+        <a href="{{ url_for('users') }}" class="btn btn-outline">← Cancel</a>
+        <button type="submit" class="btn btn-primary">Register Member</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

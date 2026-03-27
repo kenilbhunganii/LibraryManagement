@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+{% block topbar_title %}Search{% endblock %}
+
+{% block content %}
+<div class="page-header fade-up">
+  <div class="page-header-left">
+    <p class="page-eyebrow">Catalog</p>
+    <h1 class="page-title">Search</h1>
+  </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="fade-up fade-up-1" style="margin-bottom: 32px;">
+  <form method="GET" action="{{ url_for('search') }}">
+    <div style="display: flex; gap: 0; border: 2px solid var(--black); max-width: 580px;">
+      <div style="position: relative; flex: 1;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+          style="position:absolute; left:16px; top:50%; transform:translateY(-50%); width:16px; height:16px; color: var(--gray-400);">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" name="q" id="q" value="{{ query }}"
+          class="form-input"
+          style="border: none; padding-left: 44px; font-size: 15px; height: 52px; outline: none;"
+          placeholder="Search by title, author, or ISBN…"
+          autofocus>
+      </div>
+      <button type="submit" class="btn btn-primary" style="border: none; border-left: 2px solid var(--black); border-radius: 0; padding: 0 24px; font-size: 13px;">
+        Search
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- RESULTS -->
+{% if query %}
+<div class="fade-up fade-up-2">
+  <p class="section-label">
+    {{ results|length }} result{% if results|length != 1 %}s{% endif %}
+    for &ldquo;{{ query }}&rdquo;
+  </p>
+
+  {% if results %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Year</th>
+          <th>ISBN</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in results %}
+        <tr>
+          <td><strong>{{ book.title }}</strong></td>
+          <td>{{ book.author }}</td>
+          <td class="mono">{{ book.year }}</td>
+          <td class="mono">{{ book.isbn }}</td>
+          <td>
+            {% if book.available %}
+              <span class="badge badge-available">Available</span>
+            {% else %}
+              <span class="badge badge-borrowed">Borrowed</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">🔍</span>
+    <p class="empty-title">No results found</p>
+    <p class="empty-desc">Try a different title, author, or ISBN</p>
+  </div>
+  {% endif %}
+</div>
+
+{% else %}
+<!-- SUGGESTIONS -->
+<div class="fade-up fade-up-2">
+  <p class="section-label">Recent Books</p>
+  <div class="table-wrapper">
+    {% if all_books %}
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Year</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in all_books[:8] %}
+        <tr>
+          <td><strong>{{ book.title }}</strong></td>
+          <td>{{ book.author }}</td>
+          <td class="mono">{{ book.year }}</td>
+          <td>
+            {% if book.available %}
+              <span class="badge badge-available">Available</span>
+            {% else %}
+              <span class="badge badge-borrowed">Borrowed</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-icon">📚</span>
+      <p class="empty-title">No books yet</p>
+      <p class="empty-desc">Add books first, then search them here</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
