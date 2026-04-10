@@ -11,7 +11,7 @@
   </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+<div class="borrow-grid">
 
   <!-- BORROW FORM -->
   <div class="form-card fade-up fade-up-1">
@@ -26,7 +26,7 @@
         <div class="form-group">
           <label class="form-label" for="borrow_isbn">Book (ISBN)</label>
           <div class="form-select-wrap">
-            <select id="borrow_isbn" name="isbn" class="form-select" required>
+            <select id="borrow_isbn" name="isbn" class="form-input form-select" required>
               <option value="">— Select book —</option>
               {% for book in available_books %}
               <option value="{{ book.isbn }}">{{ book.title }} — {{ book.author }}</option>
@@ -38,7 +38,7 @@
         <div class="form-group" style="margin-bottom: 0;">
           <label class="form-label" for="borrow_user">Member</label>
           <div class="form-select-wrap">
-            <select id="borrow_user" name="user_id" class="form-select" required>
+            <select id="borrow_user" name="user_id" class="form-input form-select" required>
               <option value="">— Select member —</option>
               {% for user in users %}
               <option value="{{ user.user_id }}">{{ user.name }} ({{ user.user_id }})</option>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-footer">
-          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--gray-400);">
             {{ available_books|length }} available
           </span>
           <button type="submit" class="btn btn-primary">Issue Book →</button>
@@ -59,9 +59,9 @@
 
   <!-- RETURN FORM -->
   <div class="form-card fade-up fade-up-2">
-    <div class="form-card-header" style="background: var(--white); color: var(--black); border-bottom: var(--border);">
-      <p class="form-card-title">Return a Book</p>
-      <p class="form-card-sub" style="color: var(--gray-400);">Mark a book as returned</p>
+    <div class="form-card-header-light" style="padding: 18px 24px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50);">
+      <p class="form-card-title-dark">Return a Book</p>
+      <p class="form-card-sub-dark">Mark a book as returned</p>
     </div>
     <div class="form-body">
       <form method="POST" action="{{ url_for('borrow') }}">
@@ -70,7 +70,7 @@
         <div class="form-group">
           <label class="form-label" for="return_isbn">Book (ISBN)</label>
           <div class="form-select-wrap">
-            <select id="return_isbn" name="isbn" class="form-select" required>
+            <select id="return_isbn" name="isbn" class="form-input form-select" required>
               <option value="">— Select book —</option>
               {% for book in borrowed_books %}
               <option value="{{ book.isbn }}">{{ book.title }} — {{ book.author }}</option>
@@ -82,7 +82,7 @@
         <div class="form-group" style="margin-bottom: 0;">
           <label class="form-label" for="return_user">Member</label>
           <div class="form-select-wrap">
-            <select id="return_user" name="user_id" class="form-select" required>
+            <select id="return_user" name="user_id" class="form-input form-select" required>
               <option value="">— Select member —</option>
               {% for user in users %}
               <option value="{{ user.user_id }}">{{ user.name }} ({{ user.user_id }})</option>
@@ -92,7 +92,7 @@
         </div>
 
         <div class="form-footer">
-          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--gray-400);">
             {{ borrowed_books|length }} out
           </span>
           <button type="submit" class="btn btn-outline">Return Book ↩</button>
@@ -104,7 +104,7 @@
 </div>
 
 <!-- CURRENTLY BORROWED TABLE -->
-<div style="margin-top: 36px;" class="fade-up fade-up-3">
+<div style="margin-top: 28px;" class="fade-up fade-up-3">
   <p class="section-label">Currently Borrowed</p>
   <div class="table-wrapper">
     {% if borrowed_books %}

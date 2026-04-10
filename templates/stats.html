@@ -42,37 +42,26 @@
 </div>
 
 <!-- UTILIZATION BAR -->
-<div class="fade-up fade-up-2" style="margin-bottom: 36px;">
+<div class="fade-up fade-up-2" style="margin-bottom: 24px;">
   <p class="section-label">Collection Utilization</p>
-  <div style="border: var(--border); overflow: hidden;">
-    <div style="height: 48px; background: var(--gray-100); position: relative; display: flex; align-items: center;">
+  <div class="util-bar-wrap">
+    <div class="util-bar-inner">
       {% if total_books > 0 %}
-      <div style="
-        height: 100%;
-        width: {{ ((borrowed_books / total_books) * 100)|round|int }}%;
-        background: var(--black);
-        transition: width 0.6s ease;
-        display: flex; align-items: center; justify-content: flex-end;
-        padding-right: 14px;
-      ">
+      <div class="util-bar-fill" style="width: {{ ((borrowed_books / total_books) * 100)|round|int }}%;">
         {% if ((borrowed_books / total_books) * 100)|round|int > 15 %}
-        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--white); letter-spacing: 1px;">
+        <span class="util-bar-label-inside">
           {{ ((borrowed_books / total_books) * 100)|round|int }}%
         </span>
         {% endif %}
       </div>
       {% endif %}
-      <span style="
-        position: absolute; right: 16px;
-        font-family: var(--font-mono); font-size: 10px;
-        color: var(--gray-400); letter-spacing: 1px;
-      ">{{ borrowed_books }}/{{ total_books }} out</span>
+      <span class="util-bar-label-outside">{{ borrowed_books }}/{{ total_books }} out</span>
     </div>
   </div>
 </div>
 
 <!-- GENRE BREAKDOWN + TOP MEMBERS -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="fade-up fade-up-3">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="fade-up fade-up-3">
 
   <!-- GENRE -->
   <div>
@@ -89,11 +78,11 @@
             <td>{{ genre }}</td>
             <td class="mono">{{ count }}</td>
             <td>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="flex: 1; height: 6px; background: var(--gray-100);">
-                  <div style="height: 100%; width: {{ ((count / total_books) * 100)|round|int }}%; background: var(--black);"></div>
+              <div class="mini-bar-wrap">
+                <div class="mini-bar-track">
+                  <div class="mini-bar-fill" style="width: {{ ((count / total_books) * 100)|round|int }}%;"></div>
                 </div>
-                <span class="mono" style="font-size: 10px; min-width: 32px;">{{ ((count / total_books) * 100)|round|int }}%</span>
+                <span class="mini-bar-pct">{{ ((count / total_books) * 100)|round|int }}%</span>
               </div>
             </td>
           </tr>
@@ -101,7 +90,7 @@
         </tbody>
       </table>
       {% else %}
-      <div class="empty-state" style="padding: 40px;">
+      <div class="empty-state">
         <p class="empty-desc">No genre data available</p>
       </div>
       {% endif %}
@@ -121,10 +110,8 @@
           {% for member in top_members %}
           <tr>
             <td>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 28px; height: 28px; background: var(--black); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 900; font-size: 13px; flex-shrink: 0;">
-                  {{ member.name[0] }}
-                </div>
+              <div class="member-row">
+                <div class="member-init">{{ member.name[0] }}</div>
                 {{ member.name }}
               </div>
             </td>
@@ -134,7 +121,7 @@
         </tbody>
       </table>
       {% else %}
-      <div class="empty-state" style="padding: 40px;">
+      <div class="empty-state">
         <p class="empty-desc">No borrowing data yet</p>
       </div>
       {% endif %}

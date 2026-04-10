@@ -7,22 +7,21 @@
 <div class="page-header fade-up">
   <div class="page-header-left">
     <p class="page-eyebrow">
-      <a href="{{ url_for('books') }}" style="color: var(--gray-400); text-decoration: none;">Catalog</a>
-      → {{ book.title }}
+      <a href="{{ url_for('books') }}">Catalog</a> → {{ book.title }}
     </p>
-    <h1 class="page-title" style="font-size: 32px;">{{ book.title }}</h1>
+    <h1 class="page-title">{{ book.title }}</h1>
   </div>
-  <div style="display:flex; gap:10px;">
+  <div style="display:flex; gap:10px; align-items:center;">
     {% if book.available %}
       <a href="{{ url_for('borrow') }}" class="btn btn-primary">Issue Book →</a>
     {% else %}
-      <span class="badge badge-borrowed" style="padding: 10px 18px; font-size: 10px;">Currently Out</span>
+      <span class="badge badge-borrowed" style="padding: 8px 16px; font-size: 11px;">Currently Out</span>
     {% endif %}
   </div>
 </div>
 
 <!-- INFO GRID -->
-<div class="info-grid fade-up fade-up-1" style="margin-bottom: 32px;">
+<div class="info-grid fade-up fade-up-1" style="margin-bottom: 24px;">
   <div class="info-cell">
     <p class="info-label">Author</p>
     <p class="info-value">{{ book.author }}</p>
@@ -54,14 +53,16 @@
 </div>
 
 {% if book.description %}
-<div class="fade-up fade-up-2" style="margin-bottom: 32px;">
+<div class="fade-up fade-up-2" style="margin-bottom: 24px;">
   <p class="section-label">Description</p>
-  <p style="font-size: 14px; line-height: 1.7; max-width: 640px; color: var(--gray-600);">{{ book.description }}</p>
+  <div class="table-wrapper" style="padding: 18px 20px;">
+    <p style="font-size: 14px; line-height: 1.7; color: var(--gray-600); max-width: 620px;">{{ book.description }}</p>
+  </div>
 </div>
 {% endif %}
 
 <!-- BORROW HISTORY -->
-<div class="fade-up fade-up-3">
+<div class="fade-up fade-up-3" style="margin-bottom: 24px;">
   <p class="section-label">Borrow History</p>
   <div class="activity-list">
     {% if book_history %}
@@ -78,7 +79,7 @@
     {% else %}
     <div class="activity-item">
       <div class="act-dot act-dot-in"></div>
-      <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 11px;">
+      <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 12px;">
         No borrow history yet
       </div>
     </div>
@@ -86,7 +87,7 @@
   </div>
 </div>
 
-<div style="margin-top: 32px;" class="fade-up fade-up-4">
+<div class="fade-up fade-up-4">
   <form method="POST" action="{{ url_for('delete_book_route', isbn=book.isbn) }}" style="display:inline;">
     <button type="submit" class="btn btn-sm btn-danger"
       onclick="return confirm('Permanently delete this book?')">Delete Book</button>

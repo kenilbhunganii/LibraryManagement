@@ -49,7 +49,7 @@
       <div class="form-group">
         <label class="form-label" for="genre">Genre</label>
         <div class="form-select-wrap">
-          <select id="genre" name="genre" class="form-select">
+          <select id="genre" name="genre" class="form-select form-input">
             <option value="">— Select genre —</option>
             <option>Fiction</option>
             <option>Non-Fiction</option>
@@ -67,9 +67,10 @@
       </div>
 
       <div class="form-group" style="margin-bottom: 0;">
-        <label class="form-label" for="description">Description <span style="color:var(--gray-400)">(optional)</span></label>
+        <label class="form-label" for="description">
+          Description <span style="color:var(--gray-400); font-weight:400; text-transform:none; letter-spacing:0;">(optional)</span>
+        </label>
         <textarea id="description" name="description" class="form-input"
-          style="resize: vertical; min-height: 90px;"
           placeholder="A short summary of the book…"></textarea>
       </div>
 

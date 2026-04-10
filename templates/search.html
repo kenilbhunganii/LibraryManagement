@@ -12,37 +12,144 @@
 </div>
 
 <!-- SEARCH BAR -->
-<div class="fade-up fade-up-1" style="margin-bottom: 32px;">
-  <form method="GET" action="{{ url_for('search') }}">
-    <div style="display: flex; gap: 0; border: 2px solid var(--black); max-width: 580px;">
-      <div style="position: relative; flex: 1;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-          style="position:absolute; left:16px; top:50%; transform:translateY(-50%); width:16px; height:16px; color: var(--gray-400);">
+<div class="fade-up fade-up-1" style="margin-bottom: 28px;">
+  <form method="GET" action="{{ url_for('search') }}" id="search-form">
+    <div class="search-bar-large">
+      <div class="search-icon-wrap" id="search-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" name="q" id="q" value="{{ query }}"
-          class="form-input"
-          style="border: none; padding-left: 44px; font-size: 15px; height: 52px; outline: none;"
-          placeholder="Search by title, author, or ISBN…"
-          autofocus>
       </div>
-      <button type="submit" class="btn btn-primary" style="border: none; border-left: 2px solid var(--black); border-radius: 0; padding: 0 24px; font-size: 13px;">
-        Search
-      </button>
+      <input type="text" name="q" id="q" value="{{ query }}"
+        placeholder="Search by title, author, or ISBN…" autofocus autocomplete="off">
+      <button type="submit">Search</button>
     </div>
   </form>
 </div>
 
-<!-- RESULTS -->
-{% if query %}
-<div class="fade-up fade-up-2">
-  <p class="section-label">
-    {{ results|length }} result{% if results|length != 1 %}s{% endif %}
-    for &ldquo;{{ query }}&rdquo;
-  </p>
+<!-- SPINNER (hidden by default) -->
+<style>
+  #search-spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid var(--gray-200, #e5e7eb);
+    border-top-color: var(--gray-500, #6b7280);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  {% if results %}
-  <div class="table-wrapper">
+  #live-results { transition: opacity 0.15s ease; }
+  #live-results.loading { opacity: 0.5; pointer-events: none; }
+</style>
+
+<!-- RESULTS AREA -->
+<div class="fade-up fade-up-2" id="live-results">
+
+  {# ── Static server-side render on first load ── #}
+  {% if query %}
+    <p class="section-label" id="results-label">
+      {{ results|length }} result{% if results|length != 1 %}s{% endif %}
+      for "{{ query }}"
+    </p>
+
+    {% if results %}
+    <div class="table-wrapper" id="results-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Year</th>
+            <th>ISBN</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+          {% for book in results %}
+          <tr>
+            <td><strong>{{ book.title }}</strong></td>
+            <td>{{ book.author }}</td>
+            <td class="mono">{{ book.year }}</td>
+            <td class="mono">{{ book.isbn }}</td>
+            <td>
+              {% if book.available %}
+                <span class="badge badge-available">Available</span>
+              {% else %}
+                <span class="badge badge-borrowed">Borrowed</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <div id="empty-state" class="empty-state" style="background:var(--white); border-radius:var(--border-radius); border:1px solid var(--gray-200);">
+      <span class="empty-icon">🔍</span>
+      <p class="empty-title">No results found</p>
+      <p class="empty-desc">Try a different title, author, or ISBN</p>
+    </div>
+    {% endif %}
+
+  {% else %}
+  {# ── Default view: recent books ── #}
+  <div id="default-view">
+    <p class="section-label">Recent Books</p>
+    <div class="table-wrapper">
+      {% if all_books %}
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Year</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in all_books[:8] %}
+          <tr>
+            <td><strong>{{ book.title }}</strong></td>
+            <td>{{ book.author }}</td>
+            <td class="mono">{{ book.year }}</td>
+            <td>
+              {% if book.available %}
+                <span class="badge badge-available">Available</span>
+              {% else %}
+                <span class="badge badge-borrowed">Borrowed</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">📚</span>
+        <p class="empty-title">No books yet</p>
+        <p class="empty-desc">Add books first, then search them here</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Live-search result containers (hidden until user types) #}
+  <p class="section-label" id="results-label" style="display:none;"></p>
+  <div id="spinner-wrap" style="padding:24px 0; display:none;">
+    <div id="search-spinner"></div>
+  </div>
+  <div class="table-wrapper" id="results-table-wrap" style="display:none;">
     <table>
       <thead>
         <tr>
@@ -54,82 +161,139 @@
           <th></th>
         </tr>
       </thead>
-      <tbody>
-        {% for book in results %}
-        <tr>
-          <td><strong>{{ book.title }}</strong></td>
-          <td>{{ book.author }}</td>
-          <td class="mono">{{ book.year }}</td>
-          <td class="mono">{{ book.isbn }}</td>
-          <td>
-            {% if book.available %}
-              <span class="badge badge-available">Available</span>
-            {% else %}
-              <span class="badge badge-borrowed">Borrowed</span>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      <tbody id="results-body"></tbody>
     </table>
   </div>
-
-  {% else %}
-  <div class="empty-state">
+  <div id="empty-state" class="empty-state"
+       style="display:none; background:var(--white); border-radius:var(--border-radius); border:1px solid var(--gray-200);">
     <span class="empty-icon">🔍</span>
     <p class="empty-title">No results found</p>
     <p class="empty-desc">Try a different title, author, or ISBN</p>
   </div>
   {% endif %}
-</div>
 
-{% else %}
-<!-- SUGGESTIONS -->
-<div class="fade-up fade-up-2">
-  <p class="section-label">Recent Books</p>
-  <div class="table-wrapper">
-    {% if all_books %}
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Year</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for book in all_books[:8] %}
-        <tr>
-          <td><strong>{{ book.title }}</strong></td>
-          <td>{{ book.author }}</td>
-          <td class="mono">{{ book.year }}</td>
-          <td>
-            {% if book.available %}
-              <span class="badge badge-available">Available</span>
-            {% else %}
-              <span class="badge badge-borrowed">Borrowed</span>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{{ url_for('book_detail', isbn=book.isbn) }}" class="btn btn-ghost btn-sm">View →</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <div class="empty-state">
-      <span class="empty-icon">📚</span>
-      <p class="empty-title">No books yet</p>
-      <p class="empty-desc">Add books first, then search them here</p>
-    </div>
-    {% endif %}
-  </div>
-</div>
-{% endif %}
+</div>{# /live-results #}
+
+<script>
+(function () {
+  const input       = document.getElementById('q');
+  const label       = document.getElementById('results-label');
+  const tableWrap   = document.getElementById('results-table-wrap');
+  const tbody       = document.getElementById('results-body');
+  const emptyState  = document.getElementById('empty-state');
+  const defaultView = document.getElementById('default-view');
+  const spinner     = document.getElementById('search-spinner');
+  const spinnerWrap = document.getElementById('spinner-wrap');
+  const SEARCH_URL  = "{{ url_for('search') }}";
+  const BOOK_URL    = "{{ url_for('book_detail', isbn='PLACEHOLDER') }}";
+
+  let debounceTimer = null;
+  let currentQuery  = '';
+
+  /* ── helpers ── */
+  function showSpinner() {
+    if (spinnerWrap) { spinnerWrap.style.display = 'block'; spinner.style.display = 'block'; }
+  }
+  function hideSpinner() {
+    if (spinnerWrap) { spinnerWrap.style.display = 'none';  spinner.style.display = 'none'; }
+  }
+
+  function renderResults(books, query) {
+    hideSpinner();
+
+    // hide default "recent books" view once user starts typing
+    if (defaultView) defaultView.style.display = 'none';
+
+    const count = books.length;
+    label.textContent = count + ' result' + (count !== 1 ? 's' : '') + ' for "' + query + '"';
+    label.style.display = '';
+
+    if (count === 0) {
+      tableWrap.style.display = 'none';
+      emptyState.style.display = '';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+
+    tbody.innerHTML = books.map(function (book) {
+      const badge = book.available
+        ? '<span class="badge badge-available">Available</span>'
+        : '<span class="badge badge-borrowed">Borrowed</span>';
+      // Build the book-detail URL using the isbn
+      const detailUrl = BOOK_URL.replace('PLACEHOLDER', encodeURIComponent(book.isbn));
+      return '<tr>'
+        + '<td><strong>' + escHtml(book.title)  + '</strong></td>'
+        + '<td>'         + escHtml(book.author) + '</td>'
+        + '<td class="mono">' + escHtml(String(book.year)) + '</td>'
+        + '<td class="mono">' + escHtml(book.isbn) + '</td>'
+        + '<td>' + badge + '</td>'
+        + '<td><a href="' + detailUrl + '" class="btn btn-ghost btn-sm">View →</a></td>'
+        + '</tr>';
+    }).join('');
+
+    tableWrap.style.display = '';
+  }
+
+  function resetToDefault() {
+    hideSpinner();
+    label.style.display      = 'none';
+    tableWrap.style.display  = 'none';
+    emptyState.style.display = 'none';
+    if (defaultView) defaultView.style.display = '';
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ── fetch ── */
+  async function liveSearch(query) {
+    currentQuery = query;
+    showSpinner();
+
+    try {
+      const url = SEARCH_URL + '?q=' + encodeURIComponent(query) + '&format=json';
+      const res  = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+
+      // Ignore stale responses if the query changed while we were fetching
+      if (query !== currentQuery) return;
+
+      renderResults(data.results || [], query);
+
+    } catch (err) {
+      console.error('Live search error:', err);
+      hideSpinner();
+    }
+  }
+
+  /* ── input listener ── */
+  input.addEventListener('input', function () {
+    const q = input.value.trim();
+
+    clearTimeout(debounceTimer);
+
+    if (q.length === 0) {
+      resetToDefault();
+      // Reset URL without reloading
+      history.replaceState(null, '', SEARCH_URL);
+      return;
+    }
+
+    // Update the URL bar so the user can copy/share
+    history.replaceState(null, '', SEARCH_URL + '?q=' + encodeURIComponent(q));
+
+    debounceTimer = setTimeout(function () {
+      liveSearch(q);
+    }, 250); // 250 ms debounce
+  });
+
+})();
+</script>
 {% endblock %}

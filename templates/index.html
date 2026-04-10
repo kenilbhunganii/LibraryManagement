@@ -40,7 +40,7 @@
 </div>
 
 <!-- RECENT BOOKS TABLE -->
-<div class="table-wrapper fade-up fade-up-2" style="margin-bottom: 32px;">
+<div class="table-wrapper fade-up fade-up-2" style="margin-bottom: 24px;">
   <div class="table-toolbar">
     <span class="table-toolbar-title">Recent Additions</span>
     <a href="{{ url_for('books') }}" class="btn btn-ghost btn-sm">View All →</a>
@@ -85,7 +85,7 @@
 </div>
 
 <!-- RECENT ACTIVITY + QUICK ACTIONS -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="fade-up fade-up-3">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="fade-up fade-up-3">
   <div>
     <p class="section-label">Recent Activity</p>
     <div class="activity-list">
@@ -104,7 +104,7 @@
       {% else %}
       <div class="activity-item">
         <div class="act-dot act-dot-in"></div>
-        <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;">
+        <div class="act-text" style="color: var(--gray-400); font-family: var(--font-mono); font-size: 12px;">
           No activity yet
         </div>
       </div>
@@ -114,22 +114,22 @@
 
   <div>
     <p class="section-label">Quick Actions</p>
-    <div style="display: flex; flex-direction: column; gap: 1px; background: var(--black); border: var(--border);">
-      <a href="{{ url_for('add_book') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+    <div class="quick-actions">
+      <a href="{{ url_for('add_book') }}" class="quick-action-item">
         <span>Add New Book</span>
-        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+        <span class="quick-action-arrow">→</span>
       </a>
-      <a href="{{ url_for('add_user') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+      <a href="{{ url_for('add_user') }}" class="quick-action-item">
         <span>Register Member</span>
-        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+        <span class="quick-action-arrow">→</span>
       </a>
-      <a href="{{ url_for('borrow') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+      <a href="{{ url_for('borrow') }}" class="quick-action-item">
         <span>Issue a Book</span>
-        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+        <span class="quick-action-arrow">→</span>
       </a>
-      <a href="{{ url_for('search') }}" class="btn btn-ghost" style="border: none; background: var(--white); border-radius: 0; justify-content: space-between; padding: 18px 22px;">
+      <a href="{{ url_for('search') }}" class="quick-action-item">
         <span>Search Catalog</span>
-        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);">→</span>
+        <span class="quick-action-arrow">→</span>
       </a>
     </div>
   </div>

@@ -2,9 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import json
 import os
 from datetime import datetime
-from book import Book
-from user import User
-from library import search_by_title, delete_book
 
 app = Flask(__name__)
 app.secret_key = "libris-secret-key-2024"
@@ -75,11 +72,11 @@ def home():
     users = load_users()
     activity = load_activity()
 
-    total_books = len(books)
+    total_books     = len(books)
     available_books = sum(1 for b in books if b.get("available", True))
-    borrowed_books = total_books - available_books
-    total_users = len(users)
-    recent_books = books[-5:][::-1]
+    borrowed_books  = total_books - available_books
+    total_users     = len(users)
+    recent_books    = books[-5:][::-1]
     recent_activity = activity[:6]
 
     return render_template("index.html",
@@ -102,33 +99,32 @@ def books():
 @app.route("/books/add", methods=["GET", "POST"])
 def add_book():
     if request.method == "POST":
-        title = request.form["title"].strip()
-        author = request.form["author"].strip()
-        year = request.form["year"].strip()
-        isbn = request.form["isbn"].strip()
-        genre = request.form.get("genre", "").strip()
+        title       = request.form["title"].strip()
+        author      = request.form["author"].strip()
+        year        = request.form["year"].strip()
+        isbn        = request.form["isbn"].strip()
+        genre       = request.form.get("genre", "").strip()
         description = request.form.get("description", "").strip()
 
         books = load_books()
 
-        # Check duplicate ISBN
         if any(b["isbn"] == isbn for b in books):
             flash("A book with this ISBN already exists.", "error")
             return redirect(url_for("add_book"))
 
         books.append({
-            "title": title,
-            "author": author,
-            "year": year,
-            "isbn": isbn,
-            "genre": genre,
+            "title":       title,
+            "author":      author,
+            "year":        year,
+            "isbn":        isbn,
+            "genre":       genre,
             "description": description,
-            "available": True,
+            "available":   True,
             "borrowed_by": None
         })
         save_books(books)
         log_activity("add", "System", title)
-        flash(f"Book \"{title}\" added successfully.", "success")
+        flash(f'Book "{title}" added successfully.', "success")
         return redirect(url_for("books"))
 
     return render_template("add_book.html")
@@ -137,12 +133,13 @@ def add_book():
 @app.route("/books/<isbn>")
 def book_detail(isbn):
     books = load_books()
-    book = next((b for b in books if b["isbn"] == isbn), None)
+    book  = next((b for b in books if b["isbn"] == isbn), None)
+
     if not book:
         flash("Book not found.", "error")
         return redirect(url_for("books"))
 
-    activity = load_activity()
+    activity     = load_activity()
     book_history = [e for e in activity if e.get("book") == book["title"]]
 
     return render_template("book_detail.html", book=book, book_history=book_history[:10])
@@ -151,13 +148,15 @@ def book_detail(isbn):
 @app.route("/books/delete/<isbn>", methods=["POST"])
 def delete_book_route(isbn):
     books = load_books()
-    book = next((b for b in books if b["isbn"] == isbn), None)
+    book  = next((b for b in books if b["isbn"] == isbn), None)
+
     if book:
         books = [b for b in books if b["isbn"] != isbn]
         save_books(books)
-        flash(f"Book \"{book['title']}\" deleted.", "success")
+        flash(f'Book "{book["title"]}" deleted.', "success")
     else:
         flash("Book not found.", "error")
+
     return redirect(url_for("books"))
 
 
@@ -171,10 +170,10 @@ def users():
 @app.route("/users/add", methods=["GET", "POST"])
 def add_user():
     if request.method == "POST":
-        name = request.form["name"].strip()
+        name    = request.form["name"].strip()
         user_id = request.form["user_id"].strip()
-        email = request.form.get("email", "").strip()
-        phone = request.form.get("phone", "").strip()
+        email   = request.form.get("email", "").strip()
+        phone   = request.form.get("phone", "").strip()
 
         users_list = load_users()
 
@@ -183,27 +182,34 @@ def add_user():
             return redirect(url_for("add_user"))
 
         users_list.append({
-            "name": name,
-            "user_id": user_id,
-            "email": email,
-            "phone": phone,
+            "name":           name,
+            "user_id":        user_id,
+            "email":          email,
+            "phone":          phone,
             "borrowed_books": []
         })
         save_users(users_list)
-        flash(f"Member \"{name}\" registered.", "success")
+        flash(f'Member "{name}" registered.', "success")
         return redirect(url_for("users"))
 
-    return render_template("add_user.html")
+    # ← Only this line changed: pass existing_ids
+    users_list = load_users()
+    existing_ids = [u["user_id"] for u in users_list]
+    return render_template("add_user.html", existing_ids=existing_ids)
 
 
 @app.route("/users/delete/<user_id>", methods=["POST"])
 def delete_user_route(user_id):
     users_list = load_users()
-    user = next((u for u in users_list if u["user_id"] == user_id), None)
+    user       = next((u for u in users_list if u["user_id"] == user_id), None)
+
     if user:
         users_list = [u for u in users_list if u["user_id"] != user_id]
         save_users(users_list)
-        flash(f"Member \"{user['name']}\" removed.", "success")
+        flash(f'Member "{user["name"]}" removed.', "success")
+    else:
+        flash("Member not found.", "error")
+
     return redirect(url_for("users"))
 
 
@@ -215,11 +221,11 @@ def borrow():
     users_list = load_users()
 
     available_books = [b for b in books_list if b.get("available", True)]
-    borrowed_books = [b for b in books_list if not b.get("available", True)]
+    borrowed_books  = [b for b in books_list if not b.get("available", True)]
 
     if request.method == "POST":
-        action = request.form.get("action")
-        isbn = request.form.get("isbn", "").strip()
+        action  = request.form.get("action")
+        isbn    = request.form.get("isbn", "").strip()
         user_id = request.form.get("user_id", "").strip()
 
         book = next((b for b in books_list if b["isbn"] == isbn), None)
@@ -236,27 +242,27 @@ def borrow():
             if not book.get("available", True):
                 flash("This book is already borrowed.", "error")
             else:
-                book["available"] = False
+                book["available"]  = False
                 book["borrowed_by"] = user["name"]
                 if isbn not in user["borrowed_books"]:
                     user["borrowed_books"].append(isbn)
                 save_books(books_list)
                 save_users(users_list)
                 log_activity("borrow", user["name"], book["title"])
-                flash(f"\"{book['title']}\" issued to {user['name']}.", "success")
+                flash(f'"{book["title"]}" issued to {user["name"]}.', "success")
 
         elif action == "return":
             if book.get("available", True):
                 flash("This book is already marked as available.", "error")
             else:
-                book["available"] = True
+                book["available"]  = True
                 book["borrowed_by"] = None
                 if isbn in user["borrowed_books"]:
                     user["borrowed_books"].remove(isbn)
                 save_books(books_list)
                 save_users(users_list)
                 log_activity("return", user["name"], book["title"])
-                flash(f"\"{book['title']}\" returned by {user['name']}.", "success")
+                flash(f'"{book["title"]}" returned by {user["name"]}.', "success")
 
         return redirect(url_for("borrow"))
 
@@ -271,18 +277,18 @@ def borrow():
 
 @app.route("/search")
 def search():
-    query = request.args.get("q", "").strip()
+    query      = request.args.get("q", "").strip()
     books_list = load_books()
-    results = []
+    results    = []
 
     if query:
         q = query.lower()
         results = [
             b for b in books_list
-            if q in b.get("title", "").lower()
+            if q in b.get("title",  "").lower()
             or q in b.get("author", "").lower()
-            or q in b.get("isbn", "").lower()
-            or q in b.get("genre", "").lower()
+            or q in b.get("isbn",   "").lower()
+            or q in b.get("genre",  "").lower()
         ]
 
     return render_template("search.html",
@@ -303,14 +309,14 @@ def activity():
 
 @app.route("/stats")
 def stats():
-    books_list = load_books()
-    users_list = load_users()
+    books_list    = load_books()
+    users_list    = load_users()
     activity_list = load_activity()
 
-    total_books = len(books_list)
+    total_books     = len(books_list)
     available_books = sum(1 for b in books_list if b.get("available", True))
-    borrowed_books = total_books - available_books
-    total_users = len(users_list)
+    borrowed_books  = total_books - available_books
+    total_users     = len(users_list)
 
     # Genre breakdown
     genre_stats = {}
@@ -319,7 +325,7 @@ def stats():
         genre_stats[g] = genre_stats.get(g, 0) + 1
     genre_stats = dict(sorted(genre_stats.items(), key=lambda x: -x[1]))
 
-    # Top borrowers (from activity log)
+    # Top borrowers from activity log
     borrow_counts = {}
     for entry in activity_list:
         if entry.get("type") == "borrow":

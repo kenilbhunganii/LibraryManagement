@@ -4,7 +4,57 @@
         "author": "Nishi ",
         "year": "2026",
         "isbn": "4545454154522",
+        "available": true,
+        "borrowed_by": null
+    },
+    {
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "year": "1925",
+        "isbn": "978-0743273565",
+        "genre": "Fiction",
+        "description": "",
         "available": false,
-        "borrowed_by": "Venil Virani"
+        "borrowed_by": "Kenil Bhungani"
+    },
+    {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "year": "1960",
+        "isbn": "978-0061120084",
+        "genre": "Fiction",
+        "description": "",
+        "available": true,
+        "borrowed_by": null
+    },
+    {
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "year": "1813",
+        "isbn": "978-1503290563",
+        "genre": "Fantasy",
+        "description": "",
+        "available": false,
+        "borrowed_by": "Kenil Bhungani"
+    },
+    {
+        "title": "The Hobbit",
+        "author": "J.R.R. Tolkien",
+        "year": "1937",
+        "isbn": "978-0547928227",
+        "genre": "Fantasy",
+        "description": "",
+        "available": true,
+        "borrowed_by": null
+    },
+    {
+        "title": "The Da Vinci Code",
+        "author": "Dan Brown",
+        "year": "2003",
+        "isbn": "978-0307474278",
+        "genre": "Mystery",
+        "description": "",
+        "available": true,
+        "borrowed_by": null
     }
 ]
